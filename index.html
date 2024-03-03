@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-image: url('background-pomtime.jpeg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            background-color:rgba(209, 67, 67, 0.8); /* Add a semi-transparent background color */
+            border-radius: 10px;
+            padding-top: 20px;
+            padding-bottom: 20px
+
+        }
+        h1 {
+            color: #0a0a0a;
+        }
+        #timer {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0b3bbe;
+        }
+        input[type="number"] {
+            padding: 5px;
+            width: 50px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            #timer {
+                font-size: 2em;
+            }
+            button {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pomodoro Timer</h1>
+        <div id="timer">00:00</div>
+        <label for="timeInput">Adjust Time (in minutes):</label>
+        <input type="number" id="timeInput" min="1" max="60" value="0">
+        <br>
+        <button id="adjustTime">Set</button>
+        <button id="startStop">Start</button>
+        <button id="reset">Reset</button>
+        <audio id="timeSound">
+            <source src="bleep.mp3" type="audio/mpeg">
+        </audio>
+       
+    </div>
+   
+
+    <script>
+        let timer;
+        let totalTime = 25*60; // Initial time 0 min
+        let secondsPassed = 0;
+        let isTimerRunning = false;
+
+        function updateTimer() {
+            if (secondsPassed <= totalTime) {
+                let minutes = Math.floor((totalTime - secondsPassed) / 60);
+                let seconds = (totalTime - secondsPassed) % 60;
+                document.getElementById("timer").textContent = ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2);
+                secondsPassed++;
+            } else {
+                clearInterval(timer);
+                playTimerSound() ;
+            }
+        }
+        function playTimerSound() {
+            var sound = document.getElementById("timeSound");
+            sound.play();
+        }
+        
+
+        document.getElementById("startStop").addEventListener("click", function() {
+            if (!isTimerRunning) {
+                timer = setInterval(updateTimer, 1000);
+                document.getElementById("startStop").textContent = "Pause";
+            } else {
+                clearInterval(timer);
+                document.getElementById("startStop").textContent = "Start";
+            }
+            isTimerRunning = !isTimerRunning;
+        });
+
+        document.getElementById("reset").addEventListener("click", function() {
+            clearInterval(timer);
+            isTimerRunning = false;
+            secondsPassed = 0;
+            totalTime = 25*60; // Reset time to default:"00:00"
+            document.getElementById("timer").textContent = "00:00";
+            document.getElementById("startStop").textContent = "Start";
+        });
+
+        document.getElementById("adjustTime").addEventListener("click", function() {
+            let newTime = parseInt(document.getElementById("timeInput").value);
+            if (!isNaN(newTime) && newTime > 0) {
+                totalTime = newTime * 60; // Convert minutes to seconds
+                secondsPassed = 0;
+                document.getElementById("timer").textContent  ("0" + newTime).slice(-2) + ":00";
+                document.getElementById("timeInput").value = newTime;
+            } else {
+                alert("Please enter a valid time in minutes (1-60).");
+            }
+        });
+    </script>
+</body>
+</html>
